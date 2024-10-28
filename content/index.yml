@@ -1,0 +1,173 @@
+title: Visado IA
+description: Aplicación de IA para ayuda en el visado de memorias de ingeniería.
+hero:
+  title: <span class="text-primary">IA </span> para  detectar   <span class="text-primary">errores </span> en tus memorias de proyectos de ingeniería.
+  description: Gracias a la IA puedes detectar errores en tu memoria de ingeniería. Además podrás tener un listado de tus normativas caducadas, además de que podemos detectar las normativas que usas y no enumeras incluso las que usas con diferentes versiones en tu proyecto.
+  headline:
+    label: Hecho para el coeib con mucho amor
+    to: https://www.coeib.com
+    icon: i-heroicons-arrow-top-right-on-square-20-solid
+  links:
+    - label: Capacidades
+      icon: i-heroicons-arrow-right-20-solid
+      trailing: true
+      to: "#features"
+      size: xl
+    - label: Coeib
+      icon: i-simple-icons-googleearthengine
+      size: xl
+      color: gray
+      to: https://www.coeib.com
+      target: _blank
+logos:
+  title: Trusted by los mejores colegios de ingeniería industrial
+  icons:
+    - i-simple-icons-amazonaws
+    - i-simple-icons-heroku
+    - i-simple-icons-netlify
+    - i-simple-icons-vercel
+    - i-simple-icons-cloudflare
+features:
+  headline: Capacidades
+  title: Por qué confiar en nosotros?
+  description: Somos vosotros, mismos problemas, mismas ganas de mejorar, mismas ganas de aprender.
+  items:
+    - title: Fácil de usar
+      description: Subes el fichero de la memoria de ingeniería y listo.
+      icon: i-heroicons-cog
+    - title: Confiable
+      description: Toda la información está contenida en servicios seguros y confiables.El llm no guarda la información, solo la usa para generar la respuesta.
+      icon: i-heroicons-check
+    - title: Seguro
+      description: Todos los servicios usados proveen el servicio pero no almacenan la información.
+      icon: i-heroicons-lock-closed
+    - title: Rápido
+      description: Se ha generado una arquitectura de servicios que permite una respuesta rápida y escalable.
+      icon: i-heroicons-rocket-launch
+    - title: Económico
+      description: La intención de los desarrolladores es que sea lo más económico posible, además que genere ingresos para el Consejo de Ingenieros Industriales.
+      icon: i-heroicons-currency-dollar
+    - title: Escalable
+      description: El motor del LLM escala sus CPU's y sus GPU's para que sea lo más rápido posible.
+      icon: i-heroicons-chart-bar
+pricing:
+  headline: Precios
+  title: Un plan para cualquier necesidad
+  description: Desde delegar el visado a la aplicación a que se use como una herramienta o como un examen de normas previo al visado manual
+  plans:
+    - title: Basic
+      description: A basic plan for individuals.
+      price: $9.99
+      align: top
+      button:
+        label: Get Started
+        color: gray
+      features:
+        - 1 GB Storage
+        - 1 Email Account
+        - 1 Domain
+        - 1 Website
+        - 1 Database
+        - 1 SSL Certificate
+        - 1 Support Ticket
+    - title: Standard
+      description: A standard plan for small teams.
+      price: $19.99
+      highlight: true
+      scale: true
+      align: top
+      button:
+        label: Get Started
+      features:
+        - 10 GB Storage
+        - 10 Email Accounts
+        - 10 Domains
+        - 10 Websites
+        - 10 Databases
+        - 10 SSL Certificates
+        - 10 Support Tickets
+    - title: Premium
+      description: A premium plan for large teams.
+      price: $29.99
+      align: top
+      button:
+        label: Get Started
+        color: gray
+      features:
+        - 100 GB Storage
+        - 100 Email Accounts
+        - 100 Domains
+        - 100 Websites
+        - 100 Databases
+        - 100 SSL Certificates
+        - 100 Support Tickets
+testimonials:
+  headline: Testimonios
+  title: Que dicen nuestros usuarios
+  description: Tanto usuarios como empresas nos han dado su opinión para seguir mejorando y la intención es no parar de mejorar y mejorar.
+  items:
+    - quote: Nostrud tempor sunt fugiat. Dolor in sint dolore labore non occaecat adipisicing Lorem labore ullamco enim excepteur. In fugiat Lorem sit velit id veniam esse eiusmod non ea voluptate cupidatat reprehenderit ullamco dolore. Mollit laborum occaecat aliquip.
+      author:
+        name: Rose Roberson
+        description: CEO at Company
+        avatar:
+          src: https://i.pravatar.cc/120?img=1
+          loading: lazy
+    - quote: Eiusmod dolor aute ut nulla pariatur officia consequat aute amet exercitation.
+      author:
+        name: Chace Rodgers
+        description: CEO at Company
+        avatar:
+          src: https://i.pravatar.cc/120?img=7
+          loading: lazy
+    - quote: Id duis velit enim officia ad nisi incididunt magna ex dolor minim deserunt dolor. Esse incididunt cillum nostrud esse do quis amet labore amet nulla eiusmod amet nulla Lorem. Incididunt ex voluptate irure officia laboris ea proident est qui.
+      author:
+        name: Cornelius Sheppard
+        description: CEO at Company
+        avatar:
+          src: https://i.pravatar.cc/120?img=3
+          loading: lazy
+    - quote: Velit consectetur in adipisicing culpa eiusmod commodo eu ex dolore. Officia irure nisi dolor dolore velit fugiat. Aliqua sint aliqua aute elit eu sunt.
+      author:
+        name: Destinee Woods
+        description: CEO at Company
+        avatar:
+          src: https://i.pravatar.cc/120?img=5
+          loading: lazy
+    - quote: Proident quis deserunt qui ex exercitation veniam id Lorem est cupidatat ipsum irure aliquip ad.
+      author:
+        name: Kaleb Mccormick
+        description: CEO at Company
+        avatar:
+          src: https://i.pravatar.cc/120?img=8
+          loading: lazy
+    - quote: Magna officia quis ea ea in officia non voluptate ipsum culpa do labore sunt. Aute est dolore commodo sint officia ad laboris dolor magna aliquip exercitation tempor commodo.
+      author:
+        name: Jazmin Mccall
+        description: CEO at Company
+        avatar:
+          src: https://i.pravatar.cc/120?img=9
+          loading: lazy
+cta:
+  title: Empieza hoy mismo, solicita una demo
+  description: Ponte en contacto con nosotros para que te demos una demo y veas como funciona.
+  links:
+    - label: Contact us
+      size: xl
+faq:
+  title: Frequently asked questions
+  description: Aquí encontrarás las preguntas más frecuentes sobre nuestro servicio.
+  items:
+    - label: Es un servicio seguro
+      content: Todos los servidores de nuestra plataforma están certificados y están bajo el estricto control de nuestro equipo de seguridad.
+      defaultOpen: true
+    - label: Cómo puedo  cancelar mi suscripción?
+      content: Siempre hemos creído que nuestros clientes son lo mejor nuestro por eso si decides que no quieres seguir con nosotros puedes cancelar tu suscripción en cualquier momento.
+    - label: Cómo funciona la demo?
+      content: La demo es una demostración de nuestro servicio, en la cual te mostramos como funciona y como puedes usarlo.
+    - label: Cómo puedo pagar?
+      content: La forma de pago es a través de tarjeta de crédito, débito o PayPal.
+    - label: Existen devoluciones de dinero?
+      content: Al pagar por uso no hay devoluciones de dinero, pero si cancelas tu suscripción en cualquier momento puedes hacerlo sin ningún problema.
+    - label: Ofrecéis soporteporte técnico?
+      content: Sí, ofrecemos soporte técnico a través de correo electrónico o por teléfono.
