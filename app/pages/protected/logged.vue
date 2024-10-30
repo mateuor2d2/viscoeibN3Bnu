@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useUserStore } from "~/stores/user";
-import { usePdfStore } from "~/stores/pdf";
+import { usePDFStore } from "~/stores/pdf";
 const userStore = useUserStore();
-const pdfStore = usePdfStore();
+const pdfStore = usePDFStore();
 
 definePageMeta({ middleware: "auth", layouts: "app" });
 // This will be requested on server-side
@@ -58,8 +58,9 @@ const onBlur = () => {
                 <template #header>
                     Convierte el pdf a json para poder ser tratado por la IA
                 </template>
-                <UButton @click="pdfStore.setJson(pdfSource)"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Convertir a JSON
+                <UButton @click="pdfStore.setPdf(pdfSource)"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Convertir a JSON cargar
+                    pdf a store
                 </UButton>
             </UCard>
             <UCard>

@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 const { handleFileInput, files } = useFileStorage()
-const pdfStore = usePdfStore()
+const pdfStore = usePDFStore()
 
 interface Post {
   title: string;
@@ -21,7 +21,6 @@ const handleFileUpload = () => {
   // You can access the uploaded file(s) using event.target.files
   // and update the posts array accordingly
   // For example:
-
 
   if (files.value) {
     Array.from(files.value).forEach(async (file) => {
