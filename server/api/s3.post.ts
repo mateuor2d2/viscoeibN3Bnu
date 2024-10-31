@@ -1,10 +1,5 @@
 import { $fetch } from "ofetch";
-export interface S3Response {
-  limit: any;
-  skip: any;
-  total: any;
-  data: any[]; // Generic type to represent the expected data
-}
+import type { S3Response } from "~/stores/pdf";
 export default defineEventHandler(
   eventHandler(async (event: any) => {
     const config = useRuntimeConfig();
@@ -16,7 +11,7 @@ export default defineEventHandler(
     } else {
       url = config.HK_LOCAL + "/s-3/";
     }
-    console.log("url", url);
+    // console.log("url", url);
     console.log("method", method);
 
     try {
@@ -57,7 +52,7 @@ export default defineEventHandler(
         // ].join("\r\n");
 
         try {
-          const response = await $fetch(url, {
+          const response = await $fetch<S3Response>(url, {
             method: "POST",
             headers: {
               // "Content-Type": `multipart/form-data; boundary=${boundary}`,
@@ -68,12 +63,7 @@ export default defineEventHandler(
             body: formData,
           });
           // const responseData = (await response.json()) as FeathersResponsePlan;
-          return {
-            limit: response.limit,
-            skip: response.skip,
-            total: response.total,
-            data: response.data,
-          };
+          return response;
         } catch (err) {
           console.error(err);
         }

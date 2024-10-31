@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
+import type { S3Response } from '~/stores/pdf';
 const { handleFileInput, files } = useFileStorage()
 const pdfStore = usePDFStore()
 
@@ -24,7 +24,6 @@ const handleFileUpload = () => {
 
   if (files.value) {
     Array.from(files.value).forEach(async (file) => {
-      var objectUrl
       console.log(file.type)
       if (file.type === 'application/pdf') {
 
@@ -36,14 +35,17 @@ const handleFileUpload = () => {
         image: { src: file.type === 'application/pdf' ? 'pdf-icon.png' : file.content },
         date: new Date().toISOString()
       })
-      const res = await useFetch('/api/s3', {
+      const res = await useFetch<S3Response>('/api/s3', {
         method: "POST",
         body: {
           file,
           accessToken: storeUser.user.accessToken,
         }
       })
-      console.log(res)
+      console.log('7777777777777777777777777777777777\n\n')
+      console.log('res.data.value', res.data.value.sdIndex)
+      console.log(JSON.stringify(res.data.value.sdIndex))
+      pdfStore.setSDIndex(JSON.parse(res.data.value.sdIndex))
     })
   }
 
