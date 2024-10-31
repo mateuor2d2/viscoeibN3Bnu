@@ -35,6 +35,9 @@ export default defineNuxtConfig({
     HK_SERVER: process.env.HK_SERVER,
     HK_LOCAL: process.env.HK_LOCAL,
     NUXT_VPV_LICENSE_KEY: process.env.NUXT_VPV_LICENSE_KEY,
+    IA: process.env.IA,
+    IAdevelopment: process.env.IAdevelopment,
+    IAbearer: process.env.IAbearer,
   },
 
   routeRules: {

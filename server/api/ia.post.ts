@@ -1,5 +1,5 @@
 import { $fetch } from "ofetch";
-import type { ProjectTemplate } from "~/stores/pdf";
+import type { ProjectTemplate, ResultsTemplate } from "~/stores/pdf";
 export default defineEventHandler(
   eventHandler(async (event: any) => {
     const config = useRuntimeConfig();
@@ -9,10 +9,9 @@ export default defineEventHandler(
     if (config.NODE_ENV === "production") {
       url = config.IA;
     } else {
-      url =
-        "https://m2n8z7pa8dwbr0ft.eu-west-1.aws.endpoints.huggingface.cloud";
+      url = config.IAdevelopment;
     }
-    console.log("url", url);
+    // console.log("url", url);
     console.log("method", method);
 
     try {
@@ -21,13 +20,17 @@ export default defineEventHandler(
         const body = await readBody(event);
         console.log("body", body);
         try {
-          const response = await $fetch<ProjectTemplate>(url, {
+          const response = await $fetch<ResultsTemplate>(url, {
             method: "POST",
             headers: {
               Authorization: `Bearer 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`,
             },
             body,
           });
+          console.log(
+            "response",
+            JSON.parse(response[0].extracted_information[0])
+          );
           return response;
         } catch (err) {
           console.error(err);

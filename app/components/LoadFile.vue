@@ -42,9 +42,9 @@ const handleFileUpload = () => {
           accessToken: storeUser.user.accessToken,
         }
       })
-      console.log('7777777777777777777777777777777777\n\n')
-      console.log('res.data.value', res.data.value.sdIndex)
-      console.log(JSON.stringify(res.data.value.sdIndex))
+      // console.log('7777777777777777777777777777777777\n\n')
+      // console.log('res.data.value', res.data.value.sdIndex)
+      // console.log(JSON.stringify(res.data.value.sdIndex))
       pdfStore.setSDIndex(JSON.parse(res.data.value.sdIndex))
     })
   }

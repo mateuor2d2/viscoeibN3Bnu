@@ -19,34 +19,36 @@ export type ProjectTemplate = {
     "fecha del documento": string;
   };
 };
-export type ResultsTemplate = {
-  extracted_information: {
-    ingeniero: {
-      "nombre o apellidos": string;
-      "numero colegiado o de col": string;
-      "colegio profesional": string;
-      direccion: string;
-      telefono: string;
-      email: string;
-    };
-    proyecto: {
-      titulo: string;
-      direccion: string;
-      promotor: string;
-      localidad: string;
-      reglamentaciones: string[];
-      superficie: string;
-      "potencia electrica": string;
-      "ocupacion numero personas": string;
-      "fecha del documento": string;
-    };
-  };
-};
+export type ResultsTemplate = [
+  {
+    extracted_information: string;
+    //   ingeniero: {
+    //     "nombre o apellidos": string;
+    //     "numero colegiado o de col": string;
+    //     "colegio profesional": string;
+    //     direccion: string;
+    //     telefono: string;
+    //     email: string;
+    //   };
+    //   proyecto: {
+    //     titulo: string;
+    //     direccion: string;
+    //     promotor: string;
+    //     localidad: string;
+    //     reglamentaciones: string[];
+    //     superficie: string;
+    //     "potencia electrica": string;
+    //     "ocupacion numero personas": string;
+    //     "fecha del documento": string;
+    //   };
+    // };
+  }
+];
 interface PDFState {
   currentPdf: string;
   sdIndex: Record<string, string[]>;
   template: ProjectTemplate;
-  responseIA: ProjectTemplate;
+  responseIA: any;
 }
 export interface S3Response {
   _id: string;
@@ -115,61 +117,94 @@ export const usePDFStore = defineStore("pdf", {
       this.sdIndex = SDIndex;
     },
     async sendJsonsToIA() {
-      const allPromises: Promise<ResultsTemplate>[] = [];
+      const allResults: ProjectTemplate[] = [];
 
-      await Promise.all(
-        Object.entries(this.sdIndex).map(async ([key, texts]) => {
-          const textPromises = texts.map((text) =>
-            $fetch<ResultsTemplate>("/api/ia", {
-              method: "POST",
-              body: {
-                inputs: {
-                  text: text,
-                  template: JSON.stringify(this.template),
-                },
+      const entries = Object.entries(this.sdIndex);
+
+      for (const [key, texts] of entries) {
+        for (const text of texts) {
+          const result = await $fetch<ProjectTemplate>("/api/ia", {
+            method: "POST",
+            body: {
+              inputs: {
+                text: text,
+                template: JSON.stringify(this.template),
               },
-            })
-          );
+            },
+          });
+          allResults.push(result);
+        }
+      }
 
-          allPromises.push(...textPromises);
-        })
-      );
+      const results = allResults;
+      /////////////////////
+      // const allPromises: Promise<ResultsTemplate>[] = [];
 
-      const results = await Promise.all(allPromises);
+      // await Promise.all(
+      //   Object.entries(this.sdIndex)
+      //     .slice(0, 3)
+      //     .map(async ([key, texts]) => {
+      //       const textPromises = texts.map((text) =>
+      //         $fetch<ResultsTemplate>("/api/ia", {
+      //           method: "POST",
+      //           body: {
+      //             inputs: {
+      //               text: text,
+      //               template: JSON.stringify(this.template),
+      //             },
+      //           },
+      //         })
+      //       );
+
+      //       allPromises.push(...textPromises);
+      //     })
+      // );
+
+      // const results = await Promise.all(allPromises);
+      /////////////////////////7777
       console.log("results", results);
-      const transformedResults = results.map((result) => {
-        if (result.extracted_information) {
-          return result.extracted_information;
+      // const transformedResults = results.map((result) => {
+      //   if (result) {
+      //     return JSON.parse(result).extracted_information;
+      //   }
+      //   return result;
+      // });
+      //#######
+      // console.log("transformedResults", results);
+      // const mergedResult = this.mergeExtractedJsonObjects(results);
+      // console.log("mergedResult", mergedResult);
+      // const processedMergedResult = this.processMergedResult(mergedResult) as {
+      //   ingeniero: {
+      //     "nombre o apellidos": string;
+      //     "numero colegiado o de col": string;
+      //     "colegio profesional": string;
+      //     direccion: string;
+      //     telefono: string;
+      //     email: string;
+      //   };
+      //   proyecto: {
+      //     titulo: string;
+      //     direccion: string;
+      //     promotor: string;
+      //     localidad: string;
+      //     reglamentaciones: string[];
+      //     superficie: string;
+      //     "potencia electrica": string;
+      //     "ocupacion numero personas": string;
+      //     "fecha del documento": string;
+      //   };
+      // };
+      // console.log("processdMergedResults", processedMergedResult);
+      // this.responseIA = processedMergedResult;
+      // return mergedResult;
+      //#########
+      const resultsIA = results.map((result) => {
+        if (result) {
+          return JSON.parse(result[0].extracted_information);
         }
         return result;
       });
-      console.log("transformedResults", transformedResults);
-      const mergedResult = this.mergeExtractedJsonObjects(transformedResults);
-      console.log("mergedResult", mergedResult);
-      const processedMergedResult = this.processMergedResult(mergedResult) as {
-        ingeniero: {
-          "nombre o apellidos": string;
-          "numero colegiado o de col": string;
-          "colegio profesional": string;
-          direccion: string;
-          telefono: string;
-          email: string;
-        };
-        proyecto: {
-          titulo: string;
-          direccion: string;
-          promotor: string;
-          localidad: string;
-          reglamentaciones: string[];
-          superficie: string;
-          "potencia electrica": string;
-          "ocupacion numero personas": string;
-          "fecha del documento": string;
-        };
-      };
-      console.log("processdMergedResults", processedMergedResult);
-      this.responseIA = processedMergedResult;
-      return mergedResult;
+      this.responseIA = resultsIA;
     },
     normalizeString(s: string): string {
       return s.toLowerCase().trim().replace(/\s+/g, " ");
