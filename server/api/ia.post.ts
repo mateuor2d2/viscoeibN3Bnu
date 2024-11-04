@@ -23,7 +23,7 @@ export default defineEventHandler(
           const response = await $fetch<ResultsTemplate>(url, {
             method: "POST",
             headers: {
-              Authorization: `Bearer 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`,
+              Authorization: `Bearer ${config.IAbearer}`,
             },
             body,
           });
