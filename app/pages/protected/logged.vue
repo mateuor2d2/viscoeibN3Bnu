@@ -4,7 +4,7 @@ import { usePDFStore } from "~/stores/pdf";
 const userStore = useUserStore();
 const pdfStore = usePDFStore();
 
-definePageMeta({ middleware: "auth", layouts: "app" });
+definePageMeta({ middleware: "auth", layout: "applic" });
 // This will be requested on server-side
 const { data } = await useFetch<{ licenseKey: string }>('/api/vpv-license-key');
 // If the value is empty or incorrect, the watermark will remain.
