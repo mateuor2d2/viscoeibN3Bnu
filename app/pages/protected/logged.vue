@@ -14,6 +14,7 @@ const pdfSource = computed(() => {
 })
 const jsonData = computed(() => { return pdfStore.sdIndex })
 const iaData = computed(() => { return pdfStore.responseIA })
+const iaMergedData = computed(() => { return pdfStore.mergedResponseIA })
 const mode = ref('tree');
 
 
@@ -28,6 +29,7 @@ const onFocus = () => {
 const onBlur = () => {
     //
 }
+
 </script>
 
 <template>
@@ -81,6 +83,17 @@ const onBlur = () => {
                     <div class="w-full h-full">
                         <json-editor height="700" mode="tree" v-model:json="iaData" @error="onError" @focus="onFocus"
                             @blur="onBlur" />
+                    </div>
+                </div>
+            </UCard>
+            <UCard v-if="pdfStore.responseIA">
+                <template #header>
+                    Fusión del resultado en un solo json
+                </template>
+                <div class="overflow-hidden">
+                    <div class="w-full h-full">
+                        <json-editor height="700" mode="tree" v-model:json="iaMergedData" @error="onError"
+                            @focus="onFocus" @blur="onBlur" />
                     </div>
                 </div>
             </UCard>

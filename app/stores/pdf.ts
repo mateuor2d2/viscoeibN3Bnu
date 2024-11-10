@@ -49,6 +49,7 @@ interface PDFState {
   sdIndex: Record<string, string[]>;
   template: ProjectTemplate;
   responseIA: any;
+  mergedResponseIA: any;
 }
 export interface S3Response {
   _id: string;
@@ -60,7 +61,10 @@ export interface S3Response {
   lastModified: string;
   sdIndex: string;
 }
-
+type JsonValue = string | string[] | JsonObject;
+interface JsonObject {
+  [key: string]: JsonValue | undefined;
+}
 export const usePDFStore = defineStore("pdf", {
   state: (): PDFState => ({
     currentPdf: "",
@@ -87,6 +91,27 @@ export const usePDFStore = defineStore("pdf", {
       },
     },
     responseIA: {
+      ingeniero: {
+        "nombre o apellidos": "",
+        "numero colegiado o de col": "",
+        "colegio profesional": "",
+        direccion: "",
+        telefono: "",
+        email: "",
+      },
+      proyecto: {
+        titulo: "",
+        direccion: "",
+        promotor: "",
+        localidad: "",
+        reglamentaciones: [],
+        superficie: "",
+        "potencia electrica": "",
+        "ocupacion numero personas": "",
+        "fecha del documento": "",
+      },
+    },
+    mergedResponseIA: {
       ingeniero: {
         "nombre o apellidos": "",
         "numero colegiado o de col": "",
@@ -300,3 +325,74 @@ export const usePDFStore = defineStore("pdf", {
     },
   },
 });
+//// proposta de merge
+
+// function mergeJsonArray(jsonArray: JsonObject[]): JsonObject {
+//   const merged: JsonObject = {};
+
+//   jsonArray.forEach(obj => {
+//     mergeObjects(merged, obj);
+//   });
+
+//   return merged;
+// }
+
+// function mergeObjects(target: JsonObject, source: JsonObject): void {
+//   for (const key in source) {
+//     const sourceValue = source[key];
+
+//     if (sourceValue === '' || sourceValue === undefined) continue;
+
+//     if (typeof sourceValue === 'string') {
+//       mergeStringField(target, key, sourceValue);
+//     } else if (Array.isArray(sourceValue)) {
+//       mergeStringArrayField(target, key, sourceValue);
+//     } else if (typeof sourceValue === 'object' && sourceValue !== null) {
+//       if (!target[key]) target[key] = {};
+//       mergeObjects(target[key] as JsonObject, sourceValue);
+//     }
+//   }
+// }
+
+// function mergeStringField(target: JsonObject, key: string, value: string): void {
+//   if (!target[key]) {
+//     target[key] = { value, count: 1 };
+//   } else {
+//     const targetField = target[key] as { value: string; count: number };
+//     if (targetField.value === value) {
+//       targetField.count++;
+//     } else if (targetField.count === 1) {
+//       targetField.value = value;
+//       targetField.count = 1;
+//     }
+//   }
+// }
+
+// function mergeStringArrayField(target: JsonObject, key: string, valueArray: string[]): void {
+//   if (!target[key]) {
+//     target[key] = countOccurrences(valueArray);
+//   } else {
+//     const existingArray = target[key] as { [value: string]: number };
+//     const newCounts = countOccurrences(valueArray);
+
+//     for (const val in newCounts) {
+//       if (existingArray[val]) {
+//         existingArray[val] += newCounts[val];
+//       } else {
+//         existingArray[val] = newCounts[val];
+//       }
+//     }
+//   }
+// }
+
+// function countOccurrences(array: string[]): { [value: string]: number } {
+//   const counts: { [value: string]: number } = {};
+//   array.forEach(value => {
+//     if (counts[value]) {
+//       counts[value]++;
+//     } else {
+//       counts[value] = 1;
+//     }
+//   });
+//   return counts;
+// }
