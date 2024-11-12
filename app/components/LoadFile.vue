@@ -71,14 +71,14 @@ const getImageUrl = (file: File): string => {
       Upload
     </UButton>
 
-    <UBlogList class="mt-4">
+    <!-- <UBlogList class="mt-4">
       <UBlogPost v-for="(post, index) in posts" :key="index" v-bind="post">
         <template #footer>
           <UButton icon="i-heroicons-x-mark" color="red" variant="ghost" size="xs" @click="removePost(index)">
             Remove
           </UButton>
         </template>
-      </UBlogPost>
-    </UBlogList>
+</UBlogPost>
+</UBlogList> -->
   </div>
 </template>

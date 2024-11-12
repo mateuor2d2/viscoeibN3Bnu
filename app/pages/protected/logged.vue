@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useUserStore } from "~/stores/user";
 import { usePDFStore } from "~/stores/pdf";
+import { useFileUploadsStore } from "~/stores/fileUploads";
 const userStore = useUserStore();
 const pdfStore = usePDFStore();
+const fileUploadsStore = useFileUploadsStore();
 
 definePageMeta({ middleware: "auth", layout: "applic" });
 // This will be requested on server-side
@@ -16,8 +18,16 @@ const jsonData = computed(() => { return pdfStore.sdIndex })
 const iaData = computed(() => { return pdfStore.responseIA })
 const iaMergedData = computed(() => { return pdfStore.mergedResponseIA })
 const mode = ref('tree');
-
-
+const yourFilesArray = computed(() => { return fileUploadsStore.files })
+// Add onMounted hook to fetch last 10 projects
+onMounted(async () => {
+    try {
+        const response = await fileUploadsStore.getAllFiles()
+        console.log('response', response)
+    } catch (error) {
+        console.error('Failed to load all projects:', error)
+    }
+})
 const onError = (error) => {
     //
 }
@@ -37,11 +47,20 @@ const onBlur = () => {
         <div class="w-full px-4 space-y-6">
             <UCard>
                 <template #header>
-                    Carga el fichero pdf
+                    Ficheros subidos
                 </template>
 
+
+                <FileUploadsTable :files="yourFilesArray" :items-per-page="10" />
+
+            </UCard>
+            <UCard>
+                <template #header>
+                    Carga un nuevo fichero pdf
+                </template>
                 <load-file />
             </UCard>
+
             <UCard>
                 <ClientOnly>
                     <template #header>

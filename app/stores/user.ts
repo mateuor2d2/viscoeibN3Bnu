@@ -56,6 +56,7 @@ export const useUserStore = defineStore("user", {
     isAuthenticated: (state) => !!state.user,
     fullName: (state) =>
       state.user ? `${state.user.firstName} ${state.user.lastName}` : "",
+    accessToken: (state) => state.user?.accessToken || "",
   },
   actions: {
     incrementOperations() {
