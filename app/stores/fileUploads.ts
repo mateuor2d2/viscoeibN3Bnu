@@ -1,8 +1,15 @@
 import { defineStore } from "pinia";
 import { useUserStore } from "./user"; // Add this import
+interface FileUpload {
+  url: string;
+  key: string;
+  originalname: string;
+  size: number;
+  lastModified: Date;
+}
 
 interface FileUploadsState {
-  files: any[];
+  files: FileUpload[];
   count: number;
 }
 export interface FilesResponse {

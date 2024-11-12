@@ -7,22 +7,17 @@ interface FileUpload {
     lastModified: Date
 }
 
-const props = defineProps<{
-    files: FileUpload[]
-    itemsPerPage?: number
-    count?: number
-}>()
+// const props = defineProps<{
+//     // files: FileUpload[]
+//     itemsPerPage?: number
+//     // count?: number
+// }>()
 import { useFileUploadsStore } from "~/stores/fileUploads";
 const fileUploadsStore = useFileUploadsStore();
-
+const files = computed(() => fileUploadsStore.files)
+const count = computed(() => fileUploadsStore.count)
 const currentPage = ref(1)
-const itemsPerPage = computed(() => props.itemsPerPage || 10)
-
-const paginatedFiles = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage.value
-    const end = start + itemsPerPage.value
-    return props.files.slice(start, end)
-})
+const itemsPerPage = ref(10)
 
 // const totalPages = computed(() => Math.ceil(props.files.length / itemsPerPage.value))
 
@@ -41,7 +36,7 @@ const formatFileSize = (bytes: number) => {
 async function update() {
     const params: Record<string, any> = {
         limit: 10,
-        skip: (currentPage.value - 1) * 5,
+        skip: (currentPage.value - 1) * itemsPerPage.value,
     }
     try {
         const response = await fileUploadsStore.getAllFiles(params.limit, params.skip)
@@ -53,9 +48,10 @@ async function update() {
 }
 async function goPage(pagelocal: number) {
     const params: Record<string, any> = {
-        $limit: 5,
-        $skip: (pagelocal - 1) * 5,
+        limit: 10,
+        skip: (pagelocal - 1) * itemsPerPage.value,
     }
+    currentPage.value = pagelocal
     try {
         const response = await fileUploadsStore.getAllFiles(params.limit, params.skip)
         console.log('response', response)
@@ -68,7 +64,7 @@ async function goPage(pagelocal: number) {
 
 <template>
     <div>
-        <UTable :rows="paginatedFiles" :columns="[
+        <UTable :rows="fileUploadsStore.files" :columns="[
             {
                 key: 'originalname',
                 label: 'File Name'
@@ -102,7 +98,7 @@ async function goPage(pagelocal: number) {
 
         <div class="mt-4 flex justify-center">
             <!-- <UPagination v-model="currentPage" :total="count" :ui="{ wrapper: 'gap-1' }" /> -->
-            <UPagination class="place-content-center" v-model="currentPage" :page-count="5" :total="count" :ui="{
+            <UPagination class="place-content-center" v-model="currentPage" :page-count="10" :total="count" :ui="{
                 rounded: 'first-of-type:rounded-s-md last-of-type:rounded-e-md',
             }" :max="7" @click="update">
                 <template #first="{ onClick }">
@@ -116,7 +112,7 @@ async function goPage(pagelocal: number) {
                     <UTooltip text="Last page">
                         <UButton icon="i-heroicons-arrow-uturn-right-20-solid" color="primary"
                             :ui="{ rounded: 'rounded-full' }" class="rtl:[&_span:last-child]:rotate-180 ms-2"
-                            @click="goPage(Math.ceil(count / 5))" />
+                            @click="goPage(Math.ceil(count / 10))" />
                     </UTooltip>
                 </template>
             </UPagination>

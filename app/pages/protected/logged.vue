@@ -22,6 +22,7 @@ const yourFilesArray = computed(() => { return fileUploadsStore.files })
 const yourCount = computed(() => { return fileUploadsStore.count })
 // Add onMounted hook to fetch last 10 projects
 onMounted(async () => {
+    // it has to be done because you assure on load the componenet has something to show
     try {
         const response = await fileUploadsStore.getAllFiles(10, 0)
         console.log('response', response)
@@ -52,7 +53,7 @@ const onBlur = () => {
                 </template>
 
 
-                <FileUploadsTable :files="yourFilesArray" :count="yourCount" :items-per-page="10" />
+                <FileUploadsTable />
 
             </UCard>
             <UCard>
