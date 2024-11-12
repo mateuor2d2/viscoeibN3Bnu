@@ -19,10 +19,11 @@ const iaData = computed(() => { return pdfStore.responseIA })
 const iaMergedData = computed(() => { return pdfStore.mergedResponseIA })
 const mode = ref('tree');
 const yourFilesArray = computed(() => { return fileUploadsStore.files })
+const yourCount = computed(() => { return fileUploadsStore.count })
 // Add onMounted hook to fetch last 10 projects
 onMounted(async () => {
     try {
-        const response = await fileUploadsStore.getAllFiles()
+        const response = await fileUploadsStore.getAllFiles(10, 0)
         console.log('response', response)
     } catch (error) {
         console.error('Failed to load all projects:', error)
@@ -51,7 +52,7 @@ const onBlur = () => {
                 </template>
 
 
-                <FileUploadsTable :files="yourFilesArray" :items-per-page="10" />
+                <FileUploadsTable :files="yourFilesArray" :count="yourCount" :items-per-page="10" />
 
             </UCard>
             <UCard>

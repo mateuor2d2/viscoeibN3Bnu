@@ -3,6 +3,7 @@ import { useUserStore } from "./user"; // Add this import
 
 interface FileUploadsState {
   files: any[];
+  count: number;
 }
 export interface FilesResponse {
   total: number;
@@ -12,8 +13,9 @@ export interface FilesResponse {
 }
 export const useFileUploadsStore = defineStore({
   id: "FileUploadsStore",
-  state: () => ({
+  state: (): FileUploadsState => ({
     files: [],
+    count: 0,
   }),
   actions: {
     async getFilesFromUser(userId: string) {
@@ -36,17 +38,20 @@ export const useFileUploadsStore = defineStore({
       });
       return response;
     },
-    async getAllFiles() {
+    async getAllFiles(limit: number, skip: number) {
       const userStore = useUserStore(); // Get user store instance
       const url = "/api/filesupload/";
       const response = await $fetch<FilesResponse>(url, {
         method: "GET",
         params: {
           // folder: "all",
+          limit,
+          skip,
           accessToken: userStore.accessToken,
         },
       });
       this.files = response.data;
+      this.count = response.total;
       return response;
     },
   },

@@ -18,14 +18,20 @@ export default defineEventHandler(
       // console.log("body inside the post ", event);
       if (method === "GET") {
         const query = getQuery(event);
-        const params = event.context.params;
+        // const params = event.context.params;
+        const { limit, skip, accessToken } = query;
+        console.log("query", query);
 
         const response = await $fetch<FilesResponse>(url, {
           method: "GET",
+          params: {
+            $limit: limit,
+            $skip: skip,
+          },
           headers: {
             // "Content-Type": `multipart/form-data; boundary=${boundary}`,
             // "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${query.accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
         return response;
