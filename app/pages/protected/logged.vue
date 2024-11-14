@@ -2,8 +2,10 @@
 import { useUserStore } from "~/stores/user";
 import { usePDFStore } from "~/stores/pdf";
 import { useFileUploadsStore } from "~/stores/fileUploads";
+import { useTemplateStore } from "~/stores/template";
 const userStore = useUserStore();
 const pdfStore = usePDFStore();
+const templateStore = useTemplateStore();
 const fileUploadsStore = useFileUploadsStore();
 
 definePageMeta({ middleware: "auth", layout: "applic" });
@@ -29,6 +31,11 @@ onMounted(async () => {
     } catch (error) {
         console.error('Failed to load all projects:', error)
     }
+    try {
+        await templateStore.fetchTemplates()
+    } catch (error) {
+        console.error('Failed to load Templates:', error)
+    }
 })
 const onError = (error) => {
     //
@@ -47,6 +54,12 @@ const onBlur = () => {
 <template>
     <div v-if="!userStore.isLoading" class="flex min-h-screen items-center justify-center">
         <div class="w-full px-4 space-y-6">
+            <UCard>
+                <template #header>
+                    Selecciona un template
+                </template>
+                <select-template />
+            </UCard>
             <UCard>
                 <template #header>
                     Ficheros subidos
