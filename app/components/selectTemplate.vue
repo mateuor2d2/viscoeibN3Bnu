@@ -27,14 +27,32 @@ async function saveNewTemplate() {
   await templateStore.fetchTemplates()
   templateStore.isSaving = false
 }
-const newTemplate = () => {
-  templateStore.selectedTemplate = {
-    _id: '',
-    name: '',
-    jsonStructure: ''
+const newTemplate = (tipo: string) => {
+  if (tipo === 'new') {
+    templateStore.selectedTemplate = {
+      _id: '',
+      name: '',
+      jsonStructure: ''
+    }
+    isOpen.value = true
+  } else {
+    // generate a random string of 3 letters to put in the name
+    const randomString = Math.random().toString(36).substring(2, 5)
+    // I want to identify if the jsonstructure is an array or an object
+    // if is an object I want to stringify if object dont do anything
+    let arrayJsonStructure = templateStore.selectedTemplate.jsonStructure
+    if (typeof templateStore.selectedTemplate.jsonStructure === 'object') {
+      arrayJsonStructure = JSON.stringify(arrayJsonStructure)
+    }
+    templateStore.selectedTemplate = {
+      _id: '',
+      name: 'Copy_' + randomString + '_' + templateStore.selectedTemplate.name,
+      jsonStructure: arrayJsonStructure
+    }
+    isOpen.value = true
+    templateStore.isSaving = false
+
   }
-  isOpen.value = true
-  templateStore.isSaving = false
 }
 const handleTemplateSelection = (selected: string) => {
   console.log('Selected template:', selected)
@@ -52,9 +70,11 @@ onMounted(async () => {
   <UModal v-model="isOpen">
     <UCard>
       <template #header>
-        Ajusta las variables del nuevo template
+        <div class="flex justify-between items-center w-full">
+          <span>Ajusta las variables del nuevo template</span>
+          <UButton icon="i-heroicons-x-mark" class="text-red-500" @click="isOpen = false" />
+        </div>
 
-        <UButton icon="i-heroicons-x-mark" class="text-red-500" @click="isOpen = false" />
       </template>
       <div class="grid ">
         <div class="col-span-1">
@@ -69,14 +89,14 @@ onMounted(async () => {
     <div class="col-span-1">
       <USelect v-model="templateStore.selectedTemplate" :options="templates" option-attribute="name"
         value-attribute="_id" placeholder="Select a template" @update:model-value="handleTemplateSelection" />
-      <div class="grid grid-cols-4 gap-4">
+      <div v-if="templateStore.selectedTemplate" class="grid grid-cols-4 gap-4">
         <UButton :loading="templateStore.isSaving" class="mt-4" @click="saveCurrentTemplate">
           Save Template
         </UButton>
-        <UButton :loading="templateStore.isSaving" class="mt-4" @click="newTemplate">
+        <UButton :loading="templateStore.isSaving" class="mt-4" @click="newTemplate('no es nuevo')">
           New Template from template
         </UButton>
-        <UButton :loading="templateStore.isSaving" class="mt-4" @click="newTemplate">
+        <UButton :loading="templateStore.isSaving" class="mt-4" @click="newTemplate('new')">
           New Template
         </UButton>
       </div>
