@@ -48,7 +48,33 @@ export const useTemplateStore = defineStore("template", {
       const response = await $fetch<FilesResponse>("/api/template", {
         method: "POST",
         body: {
-          ...template,
+          template,
+          accessToken: userStore.accessToken,
+        },
+      });
+      this.templates = response.data.map((template) => ({
+        ...template,
+        jsonStructure: JSON.parse(template.jsonStructure),
+      }));
+    },
+    // add updateTemplate function
+    async updateTemplate(template: Template) {
+      const userStore = useUserStore();
+      const response = await $fetch<FilesResponse>("/api/template", {
+        method: "PUT",
+        body: {
+          template,
+          accessToken: userStore.accessToken,
+        },
+      });
+    },
+
+    async deleteTemplate(templateId: string) {
+      const userStore = useUserStore();
+      const response = await $fetch<FilesResponse>("/api/template", {
+        method: "DELETE",
+        body: {
+          _id: templateId,
           accessToken: userStore.accessToken,
         },
       });

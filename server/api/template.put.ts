@@ -17,12 +17,12 @@ export default defineEventHandler(
     console.log("method", method);
 
     // console.log("body inside the post ", event);
-    if (method === "POST") {
+    if (method === "PUT") {
       const body = await readBody(event);
       console.log("body", body);
       try {
         const response = await $fetch<FilesResponse>(url, {
-          method: "POST",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${body.accessToken}`,
           },
@@ -33,7 +33,7 @@ export default defineEventHandler(
       } catch (error: unknown) {
         throw createError({
           statusCode: 400,
-          statusMessage: `Failed to create template`,
+          statusMessage: `Failed to update template`,
         });
       }
     }
