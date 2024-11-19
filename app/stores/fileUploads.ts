@@ -12,7 +12,7 @@ interface FileUploadsState {
   files: FileUpload[];
   count: number;
 }
-export interface FilesResponse {
+interface FilesResponse {
   total: number;
   skip: number;
   limit: number;

@@ -5,43 +5,90 @@ const isOpen = ref(false)
 const isAlertOpen = ref(false)
 const hasChanges = ref(false)
 const toast = useToast()
+// NEW: Added computed property for better reactivity
+const currentTemplate = computed({
+  get: () => templateStore.selectedTemplate,
+  set: (value) => templateStore.selectedTemplate = value
+})
+
 async function updateCurrentTemplate() {
-  if (!templateStore.selectedTemplate) return
-
-  await templateStore.updateTemplate({
-
-    _id: templateStore.selectedTemplate._id,
-    name: templateStore.selectedTemplate.name,
-    jsonStructure: templateStore.selectedTemplate.jsonStructure
-  })
-  templateStore.isSaving = true
-  await templateStore.fetchTemplates()
-  templateStore.isSaving = false
-}
-const saveTemplate = async () => {
-  if (!templateStore.selectedTemplate) return
+  if (!currentTemplate.value) return
+  let arrayJsonStructure = currentTemplate.value.jsonStructure
+  if (typeof currentTemplate.value.jsonStructure === 'object') {
+    arrayJsonStructure = JSON.stringify(arrayJsonStructure)
+  }
   try {
-
-    await templateStore.saveTemplate({
-      _id: templateStore.selectedTemplate._id,
-      name: templateStore.selectedTemplate.name,
-      jsonStructure: templateStore.selectedTemplate.jsonStructure
-    })
     templateStore.isSaving = true
-    await templateStore.fetchTemplates()
+    await templateStore.updateTemplate({
+
+      _id: currentTemplate.value._id,
+      name: currentTemplate.value.name,
+      jsonStructure: arrayJsonStructure
+    })
     templateStore.isSaving = false
-    isOpen.value = false
     toast.add({
       title: 'Success!',
-      description: 'Template saved successfully',
+      description: 'Template updated successfully',
       icon: 'i-heroicons-check-circle',
       color: 'green',
       timeout: 3000,
 
     })
   } catch (error) {
+    const statusCode = error?.response?.status || 'Unknown'
     toast.add({
-      title: `Error ${error.response.status}`,
+      title: `Error ${statusCode}`,
+      description: 'Failed to update template',
+      icon: 'i-heroicons-x-circle',
+      color: 'red',
+      timeout: 3000,
+    })
+  }
+
+  await templateStore.fetchTemplates()
+  templateStore.isSaving = false
+}
+async function saveTemplate() {
+  if (!currentTemplate.value) return
+  try {
+    let arrayJsonStructure = currentTemplate.value.jsonStructure
+    if (typeof currentTemplate.value.jsonStructure === 'object') {
+      arrayJsonStructure = JSON.stringify(arrayJsonStructure)
+    }
+    templateStore.isSaving = true
+    const response = await templateStore.saveTemplate({
+      _id: currentTemplate.value._id,
+      name: currentTemplate.value.name,
+      jsonStructure: arrayJsonStructure
+    })
+    templateStore.isSaving = false
+    try {
+      const responseFetch = await templateStore.fetchTemplates()
+      templateStore.isSaving = false
+      isOpen.value = false
+      toast.add({
+        title: 'Success!',
+        description: 'Template saved successfully',
+        icon: 'i-heroicons-check-circle',
+        color: 'green',
+        timeout: 3000,
+
+      })
+    } catch (error) {
+      const statusCode = error?.response?.status || 'Unknown'
+      toast.add({
+        title: `Error ${statusCode}`,
+        description: 'Failed to loads templates',
+        icon: 'i-heroicons-x-circle',
+        color: 'red',
+        timeout: 3000,
+      })
+    }
+
+  } catch (error) {
+    const statusCode = error?.response?.status || 'Unknown'
+    toast.add({
+      title: `Error ${statusCode}`,
       description: 'Failed to save template',
       icon: 'i-heroicons-x-circle',
       color: 'red',
@@ -55,13 +102,13 @@ const newTemplate = async (tipo: string) => {
   const randomString = Math.random().toString(36).substring(2, 5)
   // I want to identify if the jsonstructure is an array or an object
   // if is an object I want to stringify if object dont do anything
-  let arrayJsonStructure = templateStore.selectedTemplate.jsonStructure
-  if (typeof templateStore.selectedTemplate.jsonStructure === 'object') {
+  let arrayJsonStructure = currentTemplate.value.jsonStructure
+  if (typeof currentTemplate.value.jsonStructure === 'object') {
     arrayJsonStructure = JSON.stringify(arrayJsonStructure)
   }
-  templateStore.selectedTemplate = {
+  currentTemplate.value = {
     _id: '',
-    name: 'Copy_' + randomString + '_' + templateStore.selectedTemplate.name,
+    name: 'Copy_' + randomString + '_' + currentTemplate.value.name,
     jsonStructure: arrayJsonStructure
   }
   isOpen.value = true
@@ -73,34 +120,34 @@ const handleTemplateSelection = (selected: string) => {
   console.log('Selected template:', selected)
   if (selected) {
     const index = templateStore.templates.findIndex(t => t._id === selected)
-    templateStore.selectedTemplate = templateStore.templates[index]
-    console.log('Selected template:', templateStore.selectedTemplate)
+    currentTemplate.value = templateStore.templates[index]
+    console.log('Selected template:', currentTemplate.value)
   }
 }
 
-// watch(() => templateStore.selectedTemplate, (newVal) => {
+// watch(() => currentTemplate.value, (newVal) => {
 //   if (newVal) {
 //     originalTemplate.value = JSON.parse(JSON.stringify(newVal))
 //   }
 // }, { immediate: true })
 
 // const hasChanges = computed(() => {
-//   if (!templateStore.selectedTemplate || !originalTemplate.value) return false
+//   if (!currentTemplate.value || !originalTemplate.value) return false
 
-//   return JSON.stringify(originalTemplate.value) !== JSON.stringify(templateStore.selectedTemplate)
+//   return JSON.stringify(originalTemplate.value) !== JSON.stringify(currentTemplate.value)
 // })
 async function handleDeleteClick() {
   isAlertOpen.value = true
 }
 
 async function confirmDelete() {
-  if (!templateStore.selectedTemplate?._id) return
+  if (!currentTemplate.value?._id) return
 
   templateStore.isSaving = true
   try {
-    await templateStore.deleteTemplate(templateStore.selectedTemplate._id)
-    await templateStore.fetchTemplates()
-    templateStore.selectedTemplate = null
+    const response = await templateStore.deleteTemplate(currentTemplate.value._id)
+    const responsefetch = await templateStore.fetchTemplates()
+    currentTemplate.value = null
     templateStore.isSaving = false
     toast.add({
       title: 'Success!',
@@ -112,11 +159,13 @@ async function confirmDelete() {
     })
     isAlertOpen.value = false
     templateStore.isSaving = false
-    templateStore.selectedTemplate = null
+    currentTemplate.value = null
 
   } catch (error) {
+    const statusCode = error?.response?.status || 'Unknown'
+
     isAlertOpen.value = false  // Close modal even on error
-    console.error('Failed to delete template:', error)
+    console.error('Failed to delete template:', statusCode)
     templateStore.isSaving = false
     toast.add({
       title: `Error ${error.response.status}`,
@@ -132,7 +181,7 @@ async function confirmDelete() {
 onMounted(async () => {
   await templateStore.fetchTemplates()
   isAlertOpen.value = false
-  // templateStore.selectedTemplate = templateStore.templates[0]
+  // currentTemplate.value = templateStore.templates[0]
 })
 
 
@@ -168,8 +217,8 @@ onMounted(async () => {
       </template>
       <div class="grid ">
         <div class="col-span-1">
-          <UInput class="mb-4" v-model="templateStore.selectedTemplate.name" label="Name" placeholder="Name" />
-          <UTextarea class="mt-4" v-model="templateStore.selectedTemplate.jsonStructure" label="JSON Structure" />
+          <UInput class="mb-4" v-model="currentTemplate.name" label="Name" placeholder="Name" />
+          <UTextarea class="mt-4" v-model="currentTemplate.jsonStructure" label="JSON Structure" />
         </div>
       </div>
       <UButton class="mt-4" @click=saveTemplate>save </UButton>
@@ -177,18 +226,18 @@ onMounted(async () => {
   </UModal>
   <div class="grid grid-cols-2 gap-4">
     <div class="col-span-1">
-      <USelect :model-value="templateStore.selectedTemplate?._id" :options="templateStore.templates"
-        option-attribute="name" value-attribute="_id" placeholder="Select a template"
-        :label="templateStore.selectedTemplate?.name" @update:model-value="handleTemplateSelection">
+      <USelect :model-value="currentTemplate?._id" :options="templateStore.templates" option-attribute="name"
+        value-attribute="_id" placeholder="Select a template" :label="currentTemplate?.name"
+        @update:model-value="handleTemplateSelection">
         <template #leading>
           <UIcon name="i-heroicons-magnifying-glass-16-solid" class="w-5 h-5" />
         </template>
       </USelect>
-      <div v-if="templateStore.selectedTemplate" class="grid grid-cols-4 gap-4">
+      <div v-if="currentTemplate" class="grid grid-cols-4 gap-4">
         <UTooltip v-show="hasChanges" text="overwrites the actual template">
           <UButton v-show="hasChanges" icon="i-heroicons-circle-stack-solid" size="sm" color="primary" variant="solid"
             label="Button" :trailing="false" :loading="templateStore.isSaving" class="mt-4"
-            @click="upadateCurrentTemplate">
+            @click="updateCurrentTemplate">
             Update Template
           </UButton>
         </UTooltip>
@@ -208,8 +257,8 @@ onMounted(async () => {
       </div>
     </div>
     <div class="col-span-1">
-      <json-editor v-if="templateStore.selectedTemplate" height="500" mode="text"
-        v-model="templateStore.selectedTemplate.jsonStructure" @update:modelValue="hasChanges = true" />
+      <json-editor v-if="currentTemplate" height="500" mode="text" v-model="currentTemplate.jsonStructure"
+        @update:modelValue="hasChanges = true" />
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 import { $fetch } from "ofetch";
-import { FilesResponse } from "~/stores/fileUploads";
+import { FilesResponse } from "~/stores/template";
 export default defineEventHandler(
   eventHandler(async (event: any) => {
     const config = useRuntimeConfig();

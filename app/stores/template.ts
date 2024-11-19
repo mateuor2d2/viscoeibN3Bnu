@@ -22,19 +22,23 @@ export const useTemplateStore = defineStore("template", {
   actions: {
     async fetchTemplates() {
       const userStore = useUserStore(); // Get user store instance
-      const response = await $fetch<FilesResponse>("/api/template", {
-        params: {
-          $skip: 0,
-          $limit: 9999,
-          accessToken: userStore.accessToken,
-        },
-      });
-      console.log(response.data[0].jsonStructure);
+      try {
+        const response = await $fetch<FilesResponse>("/api/template", {
+          params: {
+            $skip: 0,
+            $limit: 9999,
+            accessToken: userStore.accessToken,
+          },
+        });
+        console.log(response.data[0].jsonStructure);
 
-      this.templates = response.data.map((template) => ({
-        ...template,
-        jsonStructure: JSON.parse(template.jsonStructure),
-      }));
+        this.templates = response.data.map((template) => ({
+          ...template,
+          jsonStructure: JSON.parse(template.jsonStructure),
+        }));
+      } catch (error) {
+        return error;
+      }
     },
     setSelectedTemplate(template: Template) {
       this.selectedTemplate = template;
@@ -45,43 +49,58 @@ export const useTemplateStore = defineStore("template", {
         // remove _id from template object
         delete template._id;
       }
-      const response = await $fetch<FilesResponse>("/api/template", {
-        method: "POST",
-        body: {
-          template,
-          accessToken: userStore.accessToken,
-        },
-      });
-      this.templates = response.data.map((template) => ({
-        ...template,
-        jsonStructure: JSON.parse(template.jsonStructure),
-      }));
+      try {
+        const response = await $fetch<FilesResponse>("/api/template", {
+          method: "POST",
+          body: {
+            template,
+            accessToken: userStore.accessToken,
+          },
+        });
+
+        // remove selected template
+        this.selectedTemplate = null;
+
+        return response;
+      } catch (error) {
+        return error;
+      }
     },
     // add updateTemplate function
     async updateTemplate(template: Template) {
       const userStore = useUserStore();
-      const response = await $fetch<FilesResponse>("/api/template", {
-        method: "PUT",
-        body: {
-          template,
-          accessToken: userStore.accessToken,
-        },
-      });
+      try {
+        const response = await $fetch<FilesResponse>("/api/template", {
+          method: "PUT",
+          body: {
+            template,
+            accessToken: userStore.accessToken,
+          },
+        });
+
+        return response;
+      } catch (error) {
+        return error;
+      }
     },
 
     async deleteTemplate(templateId: string) {
       const userStore = useUserStore();
-      const response = await $fetch<FilesResponse>("/api/template", {
-        method: "DELETE",
-        body: {
-          _id: templateId,
-          accessToken: userStore.accessToken,
-        },
-      });
-      this.templates = response.data.map((template) => ({
-        ...template,
-        jsonStructure: JSON.parse(template.jsonStructure),
-      }));
+      try {
+        const response = await $fetch<FilesResponse>("/api/template", {
+          method: "DELETE",
+          body: {
+            _id: templateId,
+            accessToken: userStore.accessToken,
+          },
+        });
+
+        // remove selected template
+        this.selectedTemplate = null;
+        return response;
+      } catch (error) {
+        return error;
+      }
     },
   },
 });

@@ -1,5 +1,4 @@
 import { $fetch } from "ofetch";
-import type { Template } from "~/stores/template";
 import type { FilesResponse } from "~/stores/template";
 
 export default defineEventHandler(
