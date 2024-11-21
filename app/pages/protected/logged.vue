@@ -7,7 +7,13 @@ const userStore = useUserStore();
 const pdfStore = usePDFStore();
 const templateStore = useTemplateStore();
 const fileUploadsStore = useFileUploadsStore();
+const isSending = computed(() => pdfStore.isSending)
+const task = computed(() => pdfStore.step)
 
+const steps = [
+    'Sending to the IA...',
+    'Receiving from the IA...'
+]
 definePageMeta({ middleware: "auth", layout: "applic" });
 // This will be requested on server-side
 const { data } = await useFetch<{ licenseKey: string }>('/api/vpv-license-key');
@@ -52,85 +58,111 @@ const onBlur = () => {
 </script>
 
 <template>
-    <div v-if="!userStore.isLoading" class="flex min-h-screen items-center justify-center">
-        <div class="w-full px-4 space-y-6">
-            <UCard>
-                <template #header>
-                    Selecciona un template
-                </template>
-                <select-template />
-            </UCard>
-            <UCard>
-                <template #header>
-                    Ficheros subidos
-                </template>
-
-
-                <FileUploadsTable />
-
-            </UCard>
-            <UCard>
-                <template #header>
-                    Carga un nuevo fichero pdf
-                </template>
-                <load-file />
-            </UCard>
-
-            <UCard>
-                <ClientOnly>
+    <UContainer>
+        <div v-if="!userStore.isLoading" class="flex min-h-screen items-center justify-center">
+            <div class="w-full max-w-full px-4 mx-auto  lg:px-8 xl:px-12 space-y-6">
+                <UCard class="w-full lg:w-auto">
                     <template #header>
-                        Visualizador de pdf
+                        Selecciona un template
                     </template>
-                    <!-- <div class="overflow-hidden"> -->
-                    <div class="w-full" style=" height: 700px">
-                        <AppPdfViewer :src="pdfSource" title="Proyecto" :licenseKey="licenseKey" />
-                        <!-- </div> -->
-                    </div>
-                </ClientOnly>
-            </UCard>
+                    <select-template />
+                </UCard>
+                <UCard>
+                    <template #header>
+                        Ficheros subidos
+                    </template>
 
 
-            <UCard>
-                <template #header>
-                    Visualizador del resultado JSON
-                </template>
-                <div class="overflow-hidden">
-                    <div class="w-full h-full">
-                        <json-editor height="700" mode="tree" v-model:json="jsonData" @error="onError" @focus="onFocus"
-                            @blur="onBlur" />
+                    <FileUploadsTable />
+
+                </UCard>
+                <UCard v-if="pdfStore.currentPdf" class="w-full lg:w-auto">
+                    <ClientOnly>
+                        <template #header>
+                            Visualizador de pdf
+                        </template>
+                        <!-- <div class="overflow-hidden"> -->
+                        <div class="w-full lg:w-auto" style=" height: 700px">
+                            <AppPdfViewer :src="pdfSource" title="Proyecto" :licenseKey="licenseKey" />
+                            <!-- </div> -->
+                        </div>
+                    </ClientOnly>
+                </UCard>
+                <UCard class="w-full lg:w-auto">
+                    <template #header>
+                        Carga un nuevo fichero pdf
+                    </template>
+                    <load-file />
+                </UCard>
+
+
+
+
+                <UCard class="w-full lg:w-auto">
+                    <template #header>
+                        Visualizador del resultado JSON
+                    </template>
+                    <div class="overflow-hidden">
+                        <div class="w-full h-full">
+                            <json-editor height="700" mode="tree" v-model:json="jsonData" @error="onError"
+                                @focus="onFocus" @blur="onBlur" />
+                        </div>
                     </div>
-                </div>
-            </UCard>
-            <UCard>
-                <template #header>
-                    Envia el json a la IA
-                </template>
-                <UButton @click="pdfStore.sendJsonsToIA()"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enviar
-                </UButton>
-            </UCard>
-            <UCard v-if="pdfStore.responseIA">
-                <template #header>
-                    Visualizador del resultado JSON
-                </template>
-                <div class="overflow-hidden">
-                    <div class="w-full h-full">
-                        <json-editor height="700" mode="tree" v-model:json="iaData" @error="onError" @focus="onFocus"
-                            @blur="onBlur" />
+                </UCard>
+                <UCard class="w-full lg:w-auto">
+                    <template #header>
+                        Envia el json a la IA
+                    </template>
+                    <UButton @click="pdfStore.sendJsonsToIA()"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enviar
+                    </UButton>
+                    <!-- <UProgress v-if="isSending" animation="carousel" />
+                <UProgress v-if="isProcessing" animation="carousel" /> -->
+                    <UProgress v-if="isSending" :value="task" :max="steps" indicator>
+                        <template #step-0="{ step }">
+                            <span class="text-lime-500">
+                                <UIcon name="i-heroicons-arrow-up-circle" /> {{ step }}
+                            </span>
+                        </template>
+
+                        <template #step-1="{ step }">
+                            <span class="text-amber-500">
+                                <UIcon name="i-heroicons-arrow-down-circle" /> {{ step }}
+                            </span>
+                        </template>
+
+
+                    </UProgress>
+                </UCard>
+                <UCard class="w-full lg:w-auto" v-if="pdfStore.responseIA">
+                    <template #header>
+                        Visualizador del resultado JSON
+                    </template>
+                    <div class="overflow-hidden">
+                        <div class="w-full h-full">
+                            <json-editor height="700" mode="tree" v-model:json="iaData" @error="onError"
+                                @focus="onFocus" @blur="onBlur" />
+                        </div>
                     </div>
-                </div>
-            </UCard>
-            <UCard v-if="pdfStore.responseIA">
-                <template #header>
-                    Fusión del resultado en un solo json
-                </template>
-                <div class="overflow-hidden">
-                    <div class="w-full h-full">
-                        <json-editor height="700" mode="tree" v-model:json="iaMergedData" @error="onError"
-                            @focus="onFocus" @blur="onBlur" />
+                </UCard>
+                <UCard class="w-full lg:w-auto" v-if="pdfStore.responseIA">
+                    <template #header>
+                        Fusión del resultado en un solo json
+                    </template>
+                    <UButton @click="pdfStore.testMergeJson()"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Mezcla test
+                    </UButton>
+                    <UButton @click="pdfStore.processmergedResponseIA()"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">optimiza resultado
+                    </UButton>
+                    <div class="overflow-hidden">
+                        <div class="w-full h-full">
+                            <json-editor height="700" mode="tree" v-model:json="iaMergedData" @error="onError"
+                                @focus="onFocus" @blur="onBlur" />
+                        </div>
                     </div>
-                </div>
-            </UCard>
+                </UCard>
+            </div>
         </div>
-    </div>
+    </UContainer>
 </template>

@@ -124,7 +124,7 @@ const getStatusColor = computed(() => {
       <UButton v-if="!userStore.user == null || !userStore.user?.accessToken" label="Sign in" to="/login" color="white"
         variant="ghost" trailing-icon="i-heroicons-arrow-right-20-solid" class="hidden lg:flex" />
       <UButton v-else label="Sign out" color="red" variant="ghost" trailing-icon="i-heroicons-power"
-        class="hidden lg:flex" />
+        class="hidden lg:flex" @click="userStore.logout()" />
     </template>
 
     <template #panel>

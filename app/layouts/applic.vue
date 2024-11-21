@@ -67,16 +67,16 @@ const links = [
 </script>
 
 <template>
-    <div>
-        <AppHeader />
+    <div class="min-h-screen flex flex-col">
+        <AppHeader class="w-full" />
         <!-- <UDashboardToolbar class="py-0 px-1.5 overflow-x-auto">
             <UHorizontalNavigation :links="linksHeader" />
             <UColorModeButton size="sm" />
         </UDashboardToolbar> -->
-        <div class="flex">
+        <div class="flex flex-1">
             <UDashboardSidebarLinks :links="links" />
-            <div class="grow">
-                <UMain>
+            <div class="flex-1 w-full">
+                <UMain class="p-4">
                     <slot></slot>
                 </UMain>
             </div>

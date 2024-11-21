@@ -90,7 +90,10 @@ export const useUserStore = defineStore("user", {
     setUsers(users: User[]) {
       this.users = users;
     },
-
+    logout() {
+      this.user = null;
+      this.loggedIn = false;
+    },
     async login(email: string, password: string) {
       try {
         this.incrementOperations();
