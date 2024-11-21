@@ -9,12 +9,14 @@ export type ResultsTemplate = [
   }
 ];
 interface PDFState {
+  sendingProgress: number;
+  receivingProgress: number;
+  totalTexts: number;
   currentPdf: string;
   sdIndex: Record<string, string[]>;
   template: ProjectTemplate;
   responseIA: any;
   mergedResponseIA: any;
-  step: number;
   isSending: boolean;
   testResult: any;
 }
@@ -34,8 +36,10 @@ interface JsonObject {
 }
 export const usePDFStore = defineStore("pdf", {
   state: (): PDFState => ({
+    sendingProgress: 0,
+    receivingProgress: 0,
+    totalTexts: 0,
     currentPdf: "",
-    step: 0,
     isSending: false,
     sdIndex: {},
     template: {
@@ -2268,10 +2272,18 @@ export const usePDFStore = defineStore("pdf", {
       const allResults: ProjectTemplate[] = [];
 
       const entries = Object.entries(this.sdIndex);
+      // Calculate total texts across all entries
+      this.totalTexts = entries.reduce(
+        (total, [_, texts]) => total + texts.length,
+        0
+      );
+      this.totalTexts = entries.length;
+      this.sendingProgress = 0;
+      this.receivingProgress = 0;
       this.isSending = true;
-      this.step = 0;
       for (const [key, texts] of entries) {
         for (const text of texts) {
+          this.sendingProgress++; // Increment right before sending
           const result = await $fetch<ProjectTemplate>("/api/ia", {
             method: "POST",
             body: {
@@ -2282,9 +2294,9 @@ export const usePDFStore = defineStore("pdf", {
             },
           });
           allResults.push(result);
+          this.receivingProgress++; // Increment after receiving
         }
       }
-      this.step = 1;
       const results = allResults;
 
       console.log("results", results);

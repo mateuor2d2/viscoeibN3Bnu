@@ -8,12 +8,8 @@ const pdfStore = usePDFStore();
 const templateStore = useTemplateStore();
 const fileUploadsStore = useFileUploadsStore();
 const isSending = computed(() => pdfStore.isSending)
-const task = computed(() => pdfStore.step)
 
-const steps = [
-    'Sending to the IA...',
-    'Receiving from the IA...'
-]
+
 definePageMeta({ middleware: "auth", layout: "applic" });
 // This will be requested on server-side
 const { data } = await useFetch<{ licenseKey: string }>('/api/vpv-license-key');
@@ -116,23 +112,23 @@ const onBlur = () => {
                     <UButton @click="pdfStore.sendJsonsToIA()"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enviar
                     </UButton>
-                    <!-- <UProgress v-if="isSending" animation="carousel" />
-                <UProgress v-if="isProcessing" animation="carousel" /> -->
-                    <UProgress v-if="isSending" :value="task" :max="steps" indicator>
-                        <template #step-0="{ step }">
-                            <span class="text-lime-500">
-                                <UIcon name="i-heroicons-arrow-up-circle" /> {{ step }}
-                            </span>
-                        </template>
+                    <div class="space-y-4">
+                        <!-- Sending Progress -->
+                        <UProgress v-if="isSending" :value="pdfStore.sendingProgress" :max="pdfStore.totalTexts"
+                            class="bg-green-100">
+                            <div class="text-green-700">
+                                Sending {{ pdfStore.sendingProgress }}/{{ pdfStore.totalTexts }}
+                            </div>
+                        </UProgress>
 
-                        <template #step-1="{ step }">
-                            <span class="text-amber-500">
-                                <UIcon name="i-heroicons-arrow-down-circle" /> {{ step }}
-                            </span>
-                        </template>
-
-
-                    </UProgress>
+                        <!-- Receiving Progress -->
+                        <UProgress v-if="isSending" :value="pdfStore.receivingProgress" :max="pdfStore.totalTexts"
+                            class="bg-blue-100">
+                            <div class="text-blue-700">
+                                Receiving {{ pdfStore.receivingProgress }}/{{ pdfStore.totalTexts }}
+                            </div>
+                        </UProgress>
+                    </div>
                 </UCard>
                 <UCard class="w-full lg:w-auto" v-if="pdfStore.responseIA">
                     <template #header>
