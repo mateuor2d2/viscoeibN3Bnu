@@ -25,8 +25,8 @@ export const useTemplateStore = defineStore("template", {
       try {
         const response = await $fetch<FilesResponse>("/api/template", {
           params: {
-            $skip: 0,
-            $limit: 9999,
+            skip: 0,
+            limit: 9999,
             accessToken: userStore.accessToken,
           },
         });
