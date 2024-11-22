@@ -52,9 +52,9 @@ const checkServerHealth = async () => {
     if (response === 'OK') {
       serverStatus.value = 'healthy'
       statusMessage.value = 'Server Online'
-    } else if ('error' in response) {
+    } else {
       serverStatus.value = 'unhealthy'
-      statusMessage.value = response.error.message
+      statusMessage.value = 'Server Offline'
     }
   } catch (error) {
     serverStatus.value = 'unhealthy'
