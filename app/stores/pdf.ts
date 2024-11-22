@@ -16,6 +16,8 @@ interface PDFState {
   sdIndex: Record<string, string[]>;
   template: ProjectTemplate;
   resultsIA: any;
+  mergedResultsIA: any;
+  oneMergedResultsIA: any;
   mergedResponseIA: any;
   isSending: boolean;
   testResult: any;
@@ -38,6 +40,8 @@ export const usePDFStore = defineStore("pdf", {
   state: (): PDFState => ({
     sendingProgress: 0,
     receivingProgress: 0,
+    mergedResultsIA: [],
+    oneMergedResultsIA: [],
     totalTexts: 0,
     currentPdf: "",
     isSending: false,
@@ -2328,15 +2332,11 @@ export const usePDFStore = defineStore("pdf", {
       }
 
       this.isSending = false;
-
-      const resultsIA = allResults.map((result) => {
-        if (result && typeof result[0]?.extracted_information === "string") {
-          return JSON.parse(result[0].extracted_information);
-        }
-        return result;
-      });
-
-      this.mergedResponseIA = this.mergeExtractedJsonObjects(resultsIA);
+      // allResults is a list of all objects
+      console.log(allResults);
+      this.resultsIA = allResults;
+      this.mergedResultsIA = this.mergeExtractedJsonObjects(this.resultsIA);
+      this.oneMergedResultsIA = this.processMergedResult(this.mergedResultsIA);
     },
     normalizeString(s: string): string {
       return s.toLowerCase().trim().replace(/\s+/g, " ");

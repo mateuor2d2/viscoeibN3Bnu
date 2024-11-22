@@ -31,7 +31,7 @@ export default defineEventHandler(
             "response",
             JSON.parse(response[0].extracted_information[0])
           );
-          return response;
+          return JSON.parse(response[0].extracted_information[0]);
         } catch (err) {
           console.error(err);
         }

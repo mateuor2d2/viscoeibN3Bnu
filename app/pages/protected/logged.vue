@@ -22,7 +22,8 @@ const jsonData = computed(() => { return pdfStore.sdIndex })
 // const iaData = computed(() => { return pdfStore.responseIA })
 // const iaMergedData = computed(() => { return pdfStore.mergedResponseIA })
 const resultsIA = computed(() => { return pdfStore.resultsIA })
-const mergedResponseIA = computed(() => { return pdfStore.mergedResponseIA })
+const mergedResultsIA = computed(() => { return pdfStore.mergedResultsIA })
+const oneMergedResultsIA = computed(() => { return pdfStore.oneMergedResultsIA })
 const mode = ref('tree');
 const yourFilesArray = computed(() => { return fileUploadsStore.files })
 const yourCount = computed(() => { return fileUploadsStore.count })
@@ -139,13 +140,24 @@ const onBlur = () => {
                         </div>
                     </div>
                 </UCard>
-                <UCard class="w-full lg:w-auto" v-if="pdfStore.mergedResponseIA">
+                <UCard class="w-full lg:w-auto" v-if="pdfStore.mergedResultsIA">
                     <template #header>
                         Datos fusionados en un solo json
                     </template>
                     <div class="overflow-hidden">
                         <div class="w-full h-full">
-                            <json-editor height="700" mode="tree" v-model:json="mergedResponseIA" @error="onError"
+                            <json-editor height="700" mode="tree" v-model:json="mergedResultsIA" @error="onError"
+                                @focus="onFocus" @blur="onBlur" />
+                        </div>
+                    </div>
+                </UCard>
+                <UCard class="w-full lg:w-auto" v-if="pdfStore.oneMergedResultsIA">
+                    <template #header>
+                        Datos fusionados en un solo json
+                    </template>
+                    <div class="overflow-hidden">
+                        <div class="w-full h-full">
+                            <json-editor height="700" mode="tree" v-model:json="oneMergedResultsIA" @error="onError"
                                 @focus="onFocus" @blur="onBlur" />
                         </div>
                     </div>
