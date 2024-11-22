@@ -15,7 +15,7 @@ interface PDFState {
   currentPdf: string;
   sdIndex: Record<string, string[]>;
   template: ProjectTemplate;
-  responseIA: any;
+  resultsIA: any;
   mergedResponseIA: any;
   isSending: boolean;
   testResult: any;
@@ -63,48 +63,8 @@ export const usePDFStore = defineStore("pdf", {
         "fecha del documento": "",
       },
     },
-    responseIA: {
-      ingeniero: {
-        "nombre o apellidos": "",
-        "numero colegiado o de col": "",
-        "colegio profesional": "",
-        direccion: "",
-        telefono: "",
-        email: "",
-      },
-      proyecto: {
-        titulo: "",
-        direccion: "",
-        promotor: "",
-        localidad: "",
-        reglamentaciones: [],
-        superficie: "",
-        "potencia electrica": "",
-        "ocupacion numero personas": "",
-        "fecha del documento": "",
-      },
-    },
-    mergedResponseIA: {
-      ingeniero: {
-        "nombre o apellidos": "",
-        "numero colegiado o de col": "",
-        "colegio profesional": "",
-        direccion: "",
-        telefono: "",
-        email: "",
-      },
-      proyecto: {
-        titulo: "",
-        direccion: "",
-        promotor: "",
-        localidad: "",
-        reglamentaciones: [],
-        superficie: "",
-        "potencia electrica": "",
-        "ocupacion numero personas": "",
-        "fecha del documento": "",
-      },
-    },
+    resultsIA: [],
+    mergedResponseIA: [],
     testResult: [
       {
         ingeniero: {
@@ -2253,26 +2213,78 @@ export const usePDFStore = defineStore("pdf", {
   }),
 
   actions: {
-    testMergeJson() {
-      const mergedResult = this.mergeExtractedJsonObjects(this.testResult);
-      // this.responseIA = resultsIA;
-      this.mergedResponseIA = mergedResult;
-    },
-    processmergedResponseIA() {
-      const mergedResult = this.processMergedResult(this.mergedResponseIA);
-      this.mergedResponseIA = mergedResult;
-    },
+    // testMergeJson() {
+    //   const mergedResult = this.mergeExtractedJsonObjects(this.testResult);
+    //   // this.responseIA = resultsIA;
+    //   this.mergedResponseIA = mergedResult;
+    // },
+    // processmergedResponseIA() {
+    //   const mergedResult = this.processMergedResult(this.mergedResponseIA);
+    //   this.mergedResponseIA = mergedResult;
+    // },
     setPdf(url: string) {
       this.currentPdf = url;
     },
     setSDIndex(SDIndex: Record<string, string[]>) {
       this.sdIndex = SDIndex;
     },
-    async sendJsonsToIA() {
-      const allResults: ProjectTemplate[] = [];
+    // async sendJsonsToIA() {
+    //   const allPromises: Promise<ProjectTemplate>[] = [];
+    //   const entries = Object.entries(this.sdIndex);
 
+    //   this.totalTexts = entries.reduce(
+    //     (total, [_, texts]) => total + texts.length,
+    //     0
+    //   );
+    //   this.totalTexts = entries.length;
+    //   this.sendingProgress = 0;
+    //   this.receivingProgress = 0;
+    //   this.isSending = true;
+
+    //   // Collect all promises first
+    //   for (const [key, texts] of entries) {
+    //     if (texts.length > 5) continue;
+
+    //     for (const text of texts) {
+    //       if (text.trim() === "") continue;
+
+    //       this.sendingProgress++;
+    //       const promise = $fetch<ProjectTemplate>("/api/ia", {
+    //         method: "POST",
+    //         body: {
+    //           inputs: {
+    //             text: text,
+    //             template: JSON.stringify(this.template),
+    //           },
+    //         },
+    //       });
+    //       allPromises.push(promise);
+    //     }
+    //   }
+
+    //   // Execute all promises concurrently
+    //   const results = await Promise.all(allPromises);
+
+    //   results.forEach(() => {
+    //     this.receivingProgress++;
+    //   });
+
+    //   this.isSending = false;
+
+    //   const resultsIA = results.map((result) => {
+    //     if (result && typeof result[0]?.extracted_information === "string") {
+    //       return JSON.parse(result[0].extracted_information);
+    //     }
+    //     return result;
+    //   });
+    //   this.resultsIA = this.mergeExtractedJsonObjects(resultsIA);
+    //   this.mergedResponseIA = this.processMergedResult(this.resultsIA);
+    // },
+    async sendJsonsToIA() {
+      const pendingPromises: Promise<ProjectTemplate>[] = [];
+      const allResults: ProjectTemplate[] = [];
       const entries = Object.entries(this.sdIndex);
-      // Calculate total texts across all entries
+
       this.totalTexts = entries.reduce(
         (total, [_, texts]) => total + texts.length,
         0
@@ -2281,10 +2293,16 @@ export const usePDFStore = defineStore("pdf", {
       this.sendingProgress = 0;
       this.receivingProgress = 0;
       this.isSending = true;
+
+      // Create all promises with result handling
       for (const [key, texts] of entries) {
+        if (texts.length > 5) continue;
+
         for (const text of texts) {
-          this.sendingProgress++; // Increment right before sending
-          const result = await $fetch<ProjectTemplate>("/api/ia", {
+          if (text.trim() === "") continue;
+
+          this.sendingProgress++;
+          const promise = $fetch<ProjectTemplate>("/api/ia", {
             method: "POST",
             body: {
               inputs: {
@@ -2292,59 +2310,33 @@ export const usePDFStore = defineStore("pdf", {
                 template: JSON.stringify(this.template),
               },
             },
+          }).then((result) => {
+            this.receivingProgress++;
+            allResults.push(result);
+            return result;
           });
-          allResults.push(result);
-          this.receivingProgress++; // Increment after receiving
+
+          pendingPromises.push(promise);
         }
       }
-      const results = allResults;
 
-      console.log("results", results);
+      // Wait for all promises to complete while processing results immediately
+      while (pendingPromises.length > 0) {
+        const result = await Promise.race(pendingPromises);
+        const index = pendingPromises.findIndex((p) => p.then(() => result));
+        pendingPromises.splice(index, 1);
+      }
+
       this.isSending = false;
-      // const transformedResults = results.map((result) => {
-      //   if (result) {
-      //     return JSON.parse(result).extracted_information;
-      //   }
-      //   return result;
-      // });
-      //#######
-      // console.log("transformedResults", results);
-      // const mergedResult = this.mergeExtractedJsonObjects(results);
-      // console.log("mergedResult", mergedResult);
-      // const processedMergedResult = this.processMergedResult(mergedResult) as {
-      //   ingeniero: {
-      //     "nombre o apellidos": string;
-      //     "numero colegiado o de col": string;
-      //     "colegio profesional": string;
-      //     direccion: string;
-      //     telefono: string;
-      //     email: string;
-      //   };
-      //   proyecto: {
-      //     titulo: string;
-      //     direccion: string;
-      //     promotor: string;
-      //     localidad: string;
-      //     reglamentaciones: string[];
-      //     superficie: string;
-      //     "potencia electrica": string;
-      //     "ocupacion numero personas": string;
-      //     "fecha del documento": string;
-      //   };
-      // };
-      // console.log("processdMergedResults", processedMergedResult);
-      // this.responseIA = processedMergedResult;
-      // return mergedResult;
-      //#########
-      const resultsIA = results.map((result) => {
+
+      const resultsIA = allResults.map((result) => {
         if (result && typeof result[0]?.extracted_information === "string") {
           return JSON.parse(result[0].extracted_information);
         }
         return result;
       });
-      const mergedResult = this.mergeExtractedJsonObjects(resultsIA);
-      // this.responseIA = resultsIA;
-      this.responseIA = mergedResult;
+
+      this.mergedResponseIA = this.mergeExtractedJsonObjects(resultsIA);
     },
     normalizeString(s: string): string {
       return s.toLowerCase().trim().replace(/\s+/g, " ");

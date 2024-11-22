@@ -19,8 +19,10 @@ const pdfSource = computed(() => {
     return pdfStore.currentPdf || 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
 })
 const jsonData = computed(() => { return pdfStore.sdIndex })
-const iaData = computed(() => { return pdfStore.responseIA })
-const iaMergedData = computed(() => { return pdfStore.mergedResponseIA })
+// const iaData = computed(() => { return pdfStore.responseIA })
+// const iaMergedData = computed(() => { return pdfStore.mergedResponseIA })
+const resultsIA = computed(() => { return pdfStore.resultsIA })
+const mergedResponseIA = computed(() => { return pdfStore.mergedResponseIA })
 const mode = ref('tree');
 const yourFilesArray = computed(() => { return fileUploadsStore.files })
 const yourCount = computed(() => { return fileUploadsStore.count })
@@ -114,34 +116,41 @@ const onBlur = () => {
                     </UButton>
                     <div class="space-y-4">
                         <!-- Sending Progress -->
-                        <UProgress v-if="isSending" :value="pdfStore.sendingProgress" :max="pdfStore.totalTexts"
-                            class="bg-green-100">
-                            <div class="text-green-700">
-                                Sending {{ pdfStore.sendingProgress }}/{{ pdfStore.totalTexts }}
-                            </div>
+                        <UProgress v-if="isSending" :value="(pdfStore.sendingProgress / pdfStore.totalTexts) * 100"
+                            indicator :max="pdfStore.totalTexts" color="green">
+
                         </UProgress>
 
                         <!-- Receiving Progress -->
-                        <UProgress v-if="isSending" :value="pdfStore.receivingProgress" :max="pdfStore.totalTexts"
-                            class="bg-blue-100">
-                            <div class="text-blue-700">
-                                Receiving {{ pdfStore.receivingProgress }}/{{ pdfStore.totalTexts }}
-                            </div>
+                        <UProgress v-if="isSending" :value="(pdfStore.receivingProgress / pdfStore.totalTexts) * 100"
+                            :max="pdfStore.totalTexts" color="blue" indicator>
+
                         </UProgress>
                     </div>
                 </UCard>
-                <UCard class="w-full lg:w-auto" v-if="pdfStore.responseIA">
+                <UCard class="w-full lg:w-auto" v-if="pdfStore.resultsIA">
                     <template #header>
                         Visualizador del resultado JSON
                     </template>
                     <div class="overflow-hidden">
                         <div class="w-full h-full">
-                            <json-editor height="700" mode="tree" v-model:json="iaData" @error="onError"
+                            <json-editor height="700" mode="tree" v-model:json="resultsIA" @error="onError"
                                 @focus="onFocus" @blur="onBlur" />
                         </div>
                     </div>
                 </UCard>
-                <UCard class="w-full lg:w-auto" v-if="pdfStore.responseIA">
+                <UCard class="w-full lg:w-auto" v-if="pdfStore.mergedResponseIA">
+                    <template #header>
+                        Datos fusionados en un solo json
+                    </template>
+                    <div class="overflow-hidden">
+                        <div class="w-full h-full">
+                            <json-editor height="700" mode="tree" v-model:json="mergedResponseIA" @error="onError"
+                                @focus="onFocus" @blur="onBlur" />
+                        </div>
+                    </div>
+                </UCard>
+                <!-- <UCard class="w-full lg:w-auto" v-if="pdfStore.mergedResponseIA">
                     <template #header>
                         Fusión del resultado en un solo json
                     </template>
@@ -157,7 +166,7 @@ const onBlur = () => {
                                 @focus="onFocus" @blur="onBlur" />
                         </div>
                     </div>
-                </UCard>
+                </UCard> -->
             </div>
         </div>
     </UContainer>
