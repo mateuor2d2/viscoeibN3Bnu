@@ -26,27 +26,34 @@ export const useFileUploadsStore = defineStore({
   }),
   actions: {
     async getFilesFromUser(userId: string) {
+      const userStore = useUserStore(); // Get user store instance
+      const user = userStore.user;
       const url = "/api/filesupload/";
       const response = await $fetch<FilesResponse>(url, {
         method: "GET",
-        // body: {
-        //   folder: userId,
-        // },
+        params: {
+          folder: user.collegeId,
+        },
       });
       return response;
     },
     async getFilesFromCollege(collegeId: string) {
+      const userStore = useUserStore(); // Get user store instance
+      const user = userStore.user;
       const url = "/api/filesupload/";
       const response = await $fetch<FilesResponse>(url, {
         method: "GET",
-        // body: {
-        //   folder: collegeId,
-        // },
+        params: {
+          folder: user.collegeId,
+          accessToken: userStore.accessToken,
+          userId: user._id,
+        },
       });
       return response;
     },
     async getAllFiles(limit: number, skip: number) {
       const userStore = useUserStore(); // Get user store instance
+      const user = userStore.user;
       const url = "/api/filesupload/";
       const response = await $fetch<FilesResponse>(url, {
         method: "GET",
@@ -55,6 +62,7 @@ export const useFileUploadsStore = defineStore({
           limit,
           skip,
           accessToken: userStore.accessToken,
+          userId: user._id,
         },
       });
       this.files = response.data;

@@ -5,6 +5,7 @@ export interface Template {
   _id: string;
   name: string;
   jsonStructure: string;
+  userId: string;
 }
 export interface FilesResponse {
   total: number;
@@ -22,12 +23,14 @@ export const useTemplateStore = defineStore("template", {
   actions: {
     async fetchTemplates() {
       const userStore = useUserStore(); // Get user store instance
+      const user = userStore.user;
       try {
         const response = await $fetch<FilesResponse>("/api/template", {
           params: {
             skip: 0,
             limit: 9999,
             accessToken: userStore.accessToken,
+            userId: user._id,
           },
         });
         console.log(response.data[0].jsonStructure);
@@ -45,10 +48,13 @@ export const useTemplateStore = defineStore("template", {
     },
     async saveTemplate(template: Template) {
       const userStore = useUserStore(); // Get user store instance
+      const user = userStore.user;
       if (template._id === "") {
         // remove _id from template object
         delete template._id;
       }
+      template.userId = user._id.toString();
+      console.log("template", template);
       try {
         const response = await $fetch<FilesResponse>("/api/template", {
           method: "POST",
@@ -60,7 +66,6 @@ export const useTemplateStore = defineStore("template", {
 
         // remove selected template
         this.selectedTemplate = null;
-
         return response;
       } catch (error) {
         return error;
@@ -69,12 +74,14 @@ export const useTemplateStore = defineStore("template", {
     // add updateTemplate function
     async updateTemplate(template: Template) {
       const userStore = useUserStore();
+      const user = userStore.user;
       try {
         const response = await $fetch<FilesResponse>("/api/template", {
           method: "PUT",
           body: {
             template,
             accessToken: userStore.accessToken,
+            userId: user._id,
           },
         });
 
@@ -86,12 +93,14 @@ export const useTemplateStore = defineStore("template", {
 
     async deleteTemplate(templateId: string) {
       const userStore = useUserStore();
+      const user = userStore.user;
       try {
         const response = await $fetch<FilesResponse>("/api/template", {
           method: "DELETE",
           body: {
             _id: templateId,
             accessToken: userStore.accessToken,
+            userId: user._id,
           },
         });
 

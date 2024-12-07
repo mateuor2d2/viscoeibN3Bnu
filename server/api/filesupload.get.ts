@@ -19,7 +19,7 @@ export default defineEventHandler(
       if (method === "GET") {
         const query = getQuery(event);
         // const params = event.context.params;
-        const { limit, skip, accessToken } = query;
+        const { limit, skip, accessToken, userId } = query;
         console.log("query", query);
 
         const response = await $fetch<FilesResponse>(url, {
@@ -27,6 +27,7 @@ export default defineEventHandler(
           params: {
             $limit: limit,
             $skip: skip,
+            userId: userId,
           },
           headers: {
             // "Content-Type": `multipart/form-data; boundary=${boundary}`,

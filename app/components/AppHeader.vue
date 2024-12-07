@@ -132,7 +132,7 @@ const getStatusColor = computed(() => {
 
       <UDivider class="my-6" />
 
-      <UButton label="Sign in" color="white" block class="mb-3" />
+      <UButton label="Sign in" to="/login" color="white" block class="mb-3" />
       <UButton label="Get started" block />
     </template>
   </UHeader>

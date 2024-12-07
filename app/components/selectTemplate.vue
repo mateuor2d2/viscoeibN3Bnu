@@ -23,7 +23,8 @@ async function updateCurrentTemplate() {
 
       _id: currentTemplate.value._id,
       name: currentTemplate.value.name,
-      jsonStructure: arrayJsonStructure
+      jsonStructure: arrayJsonStructure,
+      userId: currentTemplate.value.userId
     })
     templateStore.isSaving = false
     toast.add({
@@ -49,7 +50,6 @@ async function updateCurrentTemplate() {
   templateStore.isSaving = false
 }
 async function saveTemplate() {
-  if (!currentTemplate.value) return
   try {
     let arrayJsonStructure = currentTemplate.value.jsonStructure
     if (typeof currentTemplate.value.jsonStructure === 'object') {
@@ -59,32 +59,20 @@ async function saveTemplate() {
     const response = await templateStore.saveTemplate({
       _id: currentTemplate.value._id,
       name: currentTemplate.value.name,
-      jsonStructure: arrayJsonStructure
+      jsonStructure: arrayJsonStructure,
+      userId: currentTemplate.value.userId
     })
     templateStore.isSaving = false
-    try {
-      const responseFetch = await templateStore.fetchTemplates()
-      templateStore.isSaving = false
-      isOpen.value = false
-      toast.add({
-        title: 'Success!',
-        description: 'Template saved successfully',
-        icon: 'i-heroicons-check-circle',
-        color: 'green',
-        timeout: 3000,
+    isOpen.value = false
+    await templateStore.fetchTemplates()
+    toast.add({
+      title: 'Success!',
+      description: 'Template saved successfully',
+      icon: 'i-heroicons-check-circle',
+      color: 'green',
+      timeout: 3000,
 
-      })
-    } catch (error) {
-      const statusCode = error?.response?.status || 'Unknown'
-      toast.add({
-        title: `Error ${statusCode}`,
-        description: 'Failed to loads templates',
-        icon: 'i-heroicons-x-circle',
-        color: 'red',
-        timeout: 3000,
-      })
-    }
-
+    })
   } catch (error) {
     const statusCode = error?.response?.status || 'Unknown'
     toast.add({
@@ -109,7 +97,8 @@ const newTemplate = async (tipo: string) => {
   currentTemplate.value = {
     _id: '',
     name: 'Copy_' + randomString + '_' + currentTemplate.value.name,
-    jsonStructure: arrayJsonStructure
+    jsonStructure: arrayJsonStructure,
+    userId: currentTemplate.value.userId
   }
   isOpen.value = true
   templateStore.isSaving = false
